@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Łukasz\\Desktop\\Studia\\Semestr4\\Desktopowe\\faktury\\Faktury\\Faktury.csproj": {}
+    "C:\\Users\\STUDENTUM\\Desktop\\faktury\\Faktury\\Faktury.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Łukasz\\Desktop\\Studia\\Semestr4\\Desktopowe\\faktury\\Faktury\\Faktury.csproj": {
+    "C:\\Users\\STUDENTUM\\Desktop\\faktury\\Faktury\\Faktury.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Łukasz\\Desktop\\Studia\\Semestr4\\Desktopowe\\faktury\\Faktury\\Faktury.csproj",
+        "projectUniqueName": "C:\\Users\\STUDENTUM\\Desktop\\faktury\\Faktury\\Faktury.csproj",
         "projectName": "Faktury",
-        "projectPath": "C:\\Users\\Łukasz\\Desktop\\Studia\\Semestr4\\Desktopowe\\faktury\\Faktury\\Faktury.csproj",
-        "packagesPath": "C:\\Users\\Łukasz\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Łukasz\\Desktop\\Studia\\Semestr4\\Desktopowe\\faktury\\Faktury\\obj\\",
+        "projectPath": "C:\\Users\\STUDENTUM\\Desktop\\faktury\\Faktury\\Faktury.csproj",
+        "packagesPath": "C:\\Users\\STUDENTUM\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\STUDENTUM\\Desktop\\faktury\\Faktury\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Łukasz\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\STUDENTUM\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -68,7 +68,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
