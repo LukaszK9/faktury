@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Faktury")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c23b746785090444a02c5998e410e9b5d5ece18")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0ad2d6c905dfd06fb5d18ab14a13753d7f094c3e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Faktury")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Faktury")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
