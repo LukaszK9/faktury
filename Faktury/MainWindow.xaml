@@ -11,53 +11,49 @@
                 <Grid Margin="15">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
-                        
-                        <TextBlock Text="Nr Faktury:" VerticalAlignment="Center" FontWeight="Bold"/>
-                        <TextBox Width="100" Margin="10,0,20,0" Padding="2" />
-
-                        <TextBlock Text="Klient:" VerticalAlignment="Center" FontWeight="Bold"/>
-                        <ComboBox x:Name="Input_InvoiceClientName" Width="150" Margin="10,0,20,0"/>
-
-                        <TextBlock Text="Data Wystawienia:" VerticalAlignment="Center" FontWeight="Bold"/>
-                        <DatePicker Width="120" Margin="10,0,0,0"/>
-                    </StackPanel>
-
-                    <Border Grid.Row="1" Background="#FAFAFA" BorderBrush="#E0E0E0" BorderThickness="1" Padding="15" Margin="0,0,0,10" CornerRadius="5">
+                    <Border Grid.Row="0" Background="#FAFAFA" BorderBrush="#E0E0E0" BorderThickness="1" Padding="15" Margin="0,0,0,10" CornerRadius="5">
                         <Grid>
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Nazwa:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
-                            <ComboBox Grid.Row="0" Grid.Column="1" x:Name="Input_InvoiceItemName" Width="220" Margin="0,0,20,10"/>
+                            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="16" Text="Dodaj Pozycję" VerticalAlignment="Center" Margin="0,0,0,10" FontWeight="Bold"/>
 
-                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Ilość:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
-                            <TextBox Grid.Row="0" Grid.Column="3" x:Name="Input_InvoiceItemCount" Margin="0,0,0,10" Padding="3"/>
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Wybierz produkt:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="Input_InvoiceItemName" Width="220" Margin="0,0,20,10"/>
+
+                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Ilość:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                <TextBox Grid.Row="0" Grid.Column="3" x:Name="Input_InvoiceItemCount" Margin="0,0,0,10" Padding="3"/>
+
+                            </Grid>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0">
+                                <Button Content="Wyczyść Formularz" Width="130" Padding="6" Margin="0,0,10,0" Background="#F0F0F0" Click="CleanInvoiceProductForm_Click"/>
+                                <Button Content="Dodaj Pozycję" Width="120" Padding="5" Background="#4CAF50" Foreground="White" FontWeight="Bold" Click="AddInvoiceProduct_Click"/>
+                            </StackPanel>
                         </Grid>
                     </Border>
 
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,15">
-                        <Button Content="Wyczyść Formularz" Width="130" Padding="6" Margin="0,0,10,0" Background="#F0F0F0" Click="CleanInvoiceProductForm_Click"/>
-                        <Button Content="Dodaj Pozycję" Width="120" Padding="5" Background="#4CAF50" Foreground="White" FontWeight="Bold" Click="AddInvoiceProduct_Click"/>
-                    </StackPanel>
-
-                    <DataGrid Grid.Row="3" x:Name="Invoice_DataGrid" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F9F9F9" GridLinesVisibility="All">
+                    <DataGrid Grid.Row="1" x:Name="Invoice_DataGrid" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F9F9F9" GridLinesVisibility="All">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                             <DataGridTextColumn Header="Nazwa" Binding="{Binding Name}" Width="*"/>
@@ -72,9 +68,22 @@
                         </DataGrid.Columns>
                     </DataGrid>
 
-                    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                        <Button Content="Zapisz Fakturę" Width="120" Padding="5" Background="#4CAF50" Foreground="White" FontWeight="Bold"/>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+
+                        <TextBlock Text="Nr Faktury:" VerticalAlignment="Center" FontWeight="Bold"/>
+                        <TextBox Width="100" Margin="10,0,20,0" Padding="2"/>
+
+                        <TextBlock Text="Klient:" VerticalAlignment="Center" FontWeight="Bold"/>
+                        <ComboBox x:Name="Input_InvoiceClientName" Width="150" Margin="10,0,20,0"/>
+
+                        <TextBlock Text="Data Wystawienia:" VerticalAlignment="Center" FontWeight="Bold" />
+                        <DatePicker Width="120" Margin="10,0,20,0"/>
+
+                        <Button Content="Zapisz Fakturę" Width="120" Padding="5" Background="#4CAF50" Foreground="White" FontWeight="Bold" Margin="10,0,0,0"/>
+
                     </StackPanel>
+
                 </Grid>
             </TabItem>
 
@@ -82,7 +91,6 @@
                 <Grid Margin="15">
 
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
@@ -93,35 +101,49 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Nazwa Firmy / Imię i Nazwisko:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
-                            <TextBox Grid.Row="0" Grid.Column="1" x:Name="Input_ClientName" Margin="0,0,20,10" Padding="3"/>
+                            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="16" Text="Dodaj Klienta" VerticalAlignment="Center" Margin="0,0,0,10" FontWeight="Bold"/>
 
-                            <TextBlock Grid.Row="0" Grid.Column="2" Text="NIP:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
-                            <TextBox Grid.Row="0" Grid.Column="3" x:Name="Input_ClientNIP" Margin="0,0,0,10" Padding="3"/>
+                            <Grid Grid.Row="1" Margin="0,0,0,10">
 
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Adres:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
-                            <TextBox Grid.Row="1" Grid.Column="1" x:Name="Input_ClientAdress" Margin="0,0,20,0" Padding="3"/>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Email / Telefon:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
-                            <TextBox Grid.Row="1" Grid.Column="3" x:Name="Input_ClientContact" Margin="0,0,0,0" Padding="3"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Nazwa Firmy / Imię i Nazwisko:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" x:Name="Input_ClientName" Margin="0,0,20,10" Padding="3"/>
+
+                                <TextBlock Grid.Row="0" Grid.Column="2" Text="NIP:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                <TextBox Grid.Row="0" Grid.Column="3" x:Name="Input_ClientNIP" Margin="0,0,0,10" Padding="3"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Adres:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="Input_ClientAdress" Margin="0,0,20,0" Padding="3"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Email / Telefon:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                <TextBox Grid.Row="1" Grid.Column="3" x:Name="Input_ClientContact" Margin="0,0,0,0" Padding="3"/>
+
+                            </Grid>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Wyczyść Formularz" Width="130" Padding="6" Margin="0,0,10,0" Background="#F0F0F0" Click="CleanClientForm_Click"/>
+                                <Button Content="Dodaj Klienta" Width="120" Padding="5" Background="#4CAF50" Foreground="White" FontWeight="Bold" Click="AddClient_Click"/>
+                            </StackPanel>
 
                         </Grid>
+
                     </Border>
 
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,15">
-                        <Button Content="Wyczyść Formularz" Width="130" Padding="6" Margin="0,0,10,0" Background="#F0F0F0" Click="CleanClientForm_Click"/>
-                        <Button Content="Dodaj Klienta" Width="120" Padding="5" Background="#4CAF50" Foreground="White" FontWeight="Bold" Click="AddClient_Click"/>
-                    </StackPanel>
 
-                    <DataGrid Grid.Row="2" x:Name="Clients_DataGrid" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F9F9F9" GridLinesVisibility="All">
+                    <DataGrid Grid.Row="1" x:Name="Clients_DataGrid" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F9F9F9" GridLinesVisibility="All">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" IsReadOnly="True"/>
                             <DataGridTextColumn Header="Nazwa" Binding="{Binding Name}" Width="2*"/>
@@ -130,6 +152,7 @@
                             <DataGridTextColumn Header="Kontakt" Binding="{Binding Contact}" Width="150"/>
                         </DataGrid.Columns>
                     </DataGrid>
+
                 </Grid>
             </TabItem>
 

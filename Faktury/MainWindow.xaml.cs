@@ -70,7 +70,6 @@ namespace Faktury
 
             CleanClientForm_Click(null, null);
 
-            MessageBox.Show("Klient został dodany pomyślnie!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void CleanClientForm_Click(object sender, RoutedEventArgs e)
@@ -144,7 +143,7 @@ namespace Faktury
         public required string Name { get; set; }
         public required double Count { get; set; }
         public required string Unit { get; set; }
-        public required decimal PriceNetto { get; set; } // TODO: Stawka podatku / obliczanie automatycznie ceny netto na podstawie brutto i na odwrot
+        public required decimal PriceNetto { get; set; }
         public required decimal PriceBrutto { get; set; }
         public required decimal Vat { get; set; }
 
