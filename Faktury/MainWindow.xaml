@@ -170,6 +170,13 @@
                             <DataGridTextColumn Header="NIP" Binding="{Binding Nip}" Width="120"/>
                             <DataGridTextColumn Header="Adres" Binding="{Binding Adress}" Width="*"/>
                             <DataGridTextColumn Header="Kontakt" Binding="{Binding Contact}" Width="150"/>
+                            <DataGridTemplateColumn Header="Akcje" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="🗑" Width="40" Click="DeleteClient_Click"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
@@ -236,23 +243,22 @@
                     </Border>
 
                     <!-- Tabela -->
-                    <DataGrid Grid.Row="1"
-                  x:Name="Products_DataGrid"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  AlternatingRowBackground="#F9F9F9"
-                  GridLinesVisibility="All">
-
+                    <DataGrid Grid.Row="1" x:Name="Products_DataGrid" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F9F9F9" GridLinesVisibility="All">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                             <DataGridTextColumn Header="Nazwa" Binding="{Binding Name}" Width="*"/>
                             <DataGridTextColumn Header="Jednostka" Binding="{Binding Unit}" Width="100"/>
                             <DataGridTextColumn Header="Cena Netto" Binding="{Binding PriceNetto}" Width="120"/>
                             <DataGridTextColumn Header="VAT %" Binding="{Binding Vat}" Width="80"/>
+                            <DataGridTemplateColumn Header="Akcje" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="🗑" Width="40" Click="DeleteProduct_Click"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
-
                     </DataGrid>
-
                 </Grid>
             </TabItem>
 
@@ -265,20 +271,21 @@
             <TabItem Header="Raporty" x:Name="Tab_Raporty">
                 <Grid Margin="15">
 
-                    <DataGrid x:Name="Reports_DataGrid"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="False"
-                              MouseDoubleClick="Reports_DataGrid_MouseDoubleClick">
-
-
+                    <DataGrid x:Name="Reports_DataGrid" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="Reports_DataGrid_MouseDoubleClick">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                             <DataGridTextColumn Header="Klient" Binding="{Binding Client.Name}" Width="*"/>
                             <DataGridTextColumn Header="Data" Binding="{Binding Date}" Width="150"/>
                             <DataGridTextColumn Header="Netto" Binding="{Binding TotalNetto}" Width="120"/>
                             <DataGridTextColumn Header="Brutto" Binding="{Binding TotalBrutto}" Width="120"/>
+                            <DataGridTemplateColumn Header="Akcje" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="🗑" Width="40" Click="DeleteInvoice_Click"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
-
                     </DataGrid>
 
                 </Grid>

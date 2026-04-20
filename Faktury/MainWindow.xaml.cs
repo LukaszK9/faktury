@@ -132,6 +132,32 @@ namespace Faktury
 
         }
 
+        private void DeleteClient_Click(object sender, RoutedEventArgs e)
+        {
+            if (Clients_DataGrid.SelectedItem is not Client client)
+                return;
+
+            var result = MessageBox.Show(
+                "Usunąć klienta?",
+                "Potwierdzenie",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            ClientsList.Remove(client);
+
+            for (int i = 0; i < ClientsList.Count; i++)
+            {
+                ClientsList[i].Id = i + 1;
+            }
+
+            Clients_DataGrid.Items.Refresh();
+
+            Save(ClientsFile, ClientsList);
+        }
+
         private void CleanClientForm_Click(object sender, RoutedEventArgs e)
         {
             Input_ClientName.Clear();
@@ -152,7 +178,7 @@ namespace Faktury
                     Items = new ObservableCollection<InvoiceItem>()
                 };
 
-                InvoicesList.Add(_selectedInvoice);
+                Invoice_DataGrid.ItemsSource = _selectedInvoice.Items;
             }
 
             if (Input_InvoiceItemName.SelectedItem is not Product selectedProduct)
@@ -185,7 +211,6 @@ namespace Faktury
                     _selectedInvoice.Items[index] = item;
 
                 _editingItem = null;
-
                 Invoice_DataGrid.Items.Refresh();
             }
             else
@@ -197,6 +222,29 @@ namespace Faktury
 
             Input_InvoiceItemName.SelectedIndex = -1;
             Input_InvoiceItemCount.Clear();
+        }
+
+        private void DeleteInvoice_Click(object sender, RoutedEventArgs e)
+        {
+            if (Reports_DataGrid.SelectedItem is not Invoice invoice)
+                return;
+
+            var result = MessageBox.Show(
+                "Usunąć całą fakturę?",
+                "Potwierdzenie",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            InvoicesList.Remove(invoice);
+
+            RecalculateInvoiceIds();
+
+            Save(InvoicesFile, InvoicesList);
+
+            Reports_DataGrid.Items.Refresh();
         }
 
         private void CleanInvoiceProductForm_Click(Object sender, RoutedEventArgs e)
@@ -213,30 +261,28 @@ namespace Faktury
                 return;
             }
 
-            if (_selectedInvoice == null || _selectedInvoice.Items == null || _selectedInvoice.Items.Count == 0)
+            if (_selectedInvoice == null || _selectedInvoice.Items.Count == 0)
             {
                 MessageBox.Show("Dodaj produkty!");
                 return;
             }
 
-            if (_selectedInvoice.Id == 0 || !InvoicesList.Any(x => x.Id == _selectedInvoice.Id))
-            {
-                _selectedInvoice.Client = (Client)Input_InvoiceClientName.SelectedItem;
-                _selectedInvoice.Date = DateTime.Now;
+            _selectedInvoice.Client = (Client)Input_InvoiceClientName.SelectedItem;
+            _selectedInvoice.Date = DateTime.Now;
 
-                InvoicesList.Add(_selectedInvoice);
-            }
-            else
+            if (!InvoicesList.Contains(_selectedInvoice))
             {
-                _selectedInvoice.Client = (Client)Input_InvoiceClientName.SelectedItem;
+                InvoicesList.Add(_selectedInvoice);
             }
 
             Save(InvoicesFile, InvoicesList);
 
-            Reports_DataGrid.ItemsSource = null;
-            Reports_DataGrid.ItemsSource = InvoicesList;
+            Reports_DataGrid.Items.Refresh();
 
             MessageBox.Show("Faktura zapisana!");
+
+            _selectedInvoice = null;
+            Invoice_DataGrid.ItemsSource = null;
         }
 
         private void EditInvoiceItem_Click(object sender, RoutedEventArgs e)
@@ -347,6 +393,32 @@ namespace Faktury
             Save(ProductsFile, ProductsList);
 
             CleanProductForm_Click(null, null);
+        }
+
+        private void DeleteProduct_Click(object sender, RoutedEventArgs e)
+        {
+            if (Products_DataGrid.SelectedItem is not Product product)
+                return;
+
+            var result = MessageBox.Show(
+                "Usunąć produkt?",
+                "Potwierdzenie",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            ProductsList.Remove(product);
+
+            for (int i = 0; i < ProductsList.Count; i++)
+            {
+                ProductsList[i].Id = i + 1;
+            }
+
+            Products_DataGrid.Items.Refresh();
+
+            Save(ProductsFile, ProductsList);
         }
 
         private void CleanProductForm_Click(object sender, RoutedEventArgs e)
