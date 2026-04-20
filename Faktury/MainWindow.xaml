@@ -157,8 +157,82 @@
             </TabItem>
 
             <TabItem Header="Produkty" x:Name="Tab_Produkty">
-                <Grid>
-                    <TextBlock Text="Produkty" FontSize="20" Foreground="Gray" Margin="10,10,0,0"/>
+                <Grid Margin="15">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Formularz -->
+                    <Border Grid.Row="0" Background="#FAFAFA" BorderBrush="#E0E0E0" BorderThickness="1" Padding="15" Margin="0,0,0,10" CornerRadius="5">
+                        <Grid>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="16" Text="Dodaj Produkt" Margin="0,0,0,10" FontWeight="Bold"/>
+
+                            <Grid Grid.Row="1" Margin="0,0,0,10">
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Nazwa:" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" x:Name="Input_ProductName" Margin="0,0,20,10" Padding="3"/>
+
+                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Jednostka:" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                <TextBox Grid.Row="0" Grid.Column="3" x:Name="Input_ProductUnit" Margin="0,0,0,10" Padding="3"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Cena Netto:" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" x:Name="Input_ProductPrice" Margin="0,0,20,0" Padding="3"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="2" Text="VAT (%):" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                <TextBox Grid.Row="1" Grid.Column="3" x:Name="Input_ProductVat" Margin="0,0,0,0" Padding="3"/>
+
+                            </Grid>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Wyczyść Formularz" Width="130" Padding="6" Margin="0,0,10,0"
+                            Background="#F0F0F0" Click="CleanProductForm_Click"/>
+                                <Button Content="Dodaj Produkt" Width="120" Padding="5"
+                            Background="#4CAF50" Foreground="White" FontWeight="Bold"
+                            Click="AddProduct_Click"/>
+                            </StackPanel>
+
+                        </Grid>
+                    </Border>
+
+                    <!-- Tabela -->
+                    <DataGrid Grid.Row="1"
+                  x:Name="Products_DataGrid"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  AlternatingRowBackground="#F9F9F9"
+                  GridLinesVisibility="All">
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                            <DataGridTextColumn Header="Nazwa" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Jednostka" Binding="{Binding Unit}" Width="100"/>
+                            <DataGridTextColumn Header="Cena Netto" Binding="{Binding PriceNetto}" Width="120"/>
+                            <DataGridTextColumn Header="VAT %" Binding="{Binding Vat}" Width="80"/>
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+
                 </Grid>
             </TabItem>
 

@@ -30,6 +30,7 @@ namespace Faktury
 
             Invoice_DataGrid.ItemsSource = CurrentInvoiceItems;
             Clients_DataGrid.ItemsSource = ClientsList;
+            Products_DataGrid.ItemsSource = ProductsList;
 
             Input_InvoiceClientName.ItemsSource = ClientsList;
             Input_InvoiceClientName.DisplayMemberPath = "Name";
@@ -134,6 +135,47 @@ namespace Faktury
         {
             Input_InvoiceItemName.SelectedIndex = -1; // None
             Input_InvoiceItemCount.Clear();
+        }
+
+        private void AddProduct_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(Input_ProductName.Text))
+            {
+                MessageBox.Show("Nazwa produktu jest wymagana!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            int nextId = 1;
+            if (ProductsList.Count > 0)
+            {
+                int maxId = 0;
+                foreach (var p in ProductsList)
+                {
+                    if (p.Id > maxId) maxId = p.Id;
+                }
+                nextId = maxId + 1;
+            }
+
+            Product newProduct = new Product
+            {
+                Id = nextId,
+                Name = Input_ProductName.Text,
+                Unit = Input_ProductUnit.Text,
+                PriceNetto = decimal.Parse(Input_ProductPrice.Text),
+                Vat = decimal.Parse(Input_ProductVat.Text)
+            };
+
+            ProductsList.Add(newProduct);
+
+            CleanProductForm_Click(null, null);
+        }
+
+        private void CleanProductForm_Click(object sender, RoutedEventArgs e)
+        {
+            Input_ProductName.Clear();
+            Input_ProductUnit.Clear();
+            Input_ProductPrice.Clear();
+            Input_ProductVat.Clear();
         }
     }
 
