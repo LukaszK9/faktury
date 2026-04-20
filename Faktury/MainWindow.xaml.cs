@@ -2,6 +2,9 @@
 using System.Diagnostics;
 using System.Printing.IndexedProperties;
 using System.Windows;
+using System.IO;
+using System.Text.Json;
+using System.Linq;
 
 namespace Faktury
 {
@@ -16,33 +19,60 @@ namespace Faktury
         private Invoice _selectedInvoice;
         private bool IsEditMode => _selectedInvoice != null;
 
+        private const string InvoicesFile = "invoices.json";
+        private const string ClientsFile = "clients.json";
+        private const string ProductsFile = "products.json";
+
         public MainWindow()
         {
             InitializeComponent();
 
             CurrentInvoiceItems = new ObservableCollection<InvoiceItem>();
-            ClientsList = new ObservableCollection<Client>();
-            InvoicesList = new ObservableCollection<Invoice>();
+            InvoicesList = Load<Invoice>(InvoicesFile) ?? new ObservableCollection<Invoice>();
+            ClientsList = Load<Client>(ClientsFile) ?? new ObservableCollection<Client>();
+            ProductsList = Load<Product>(ProductsFile) ?? new ObservableCollection<Product>();
 
-            // TODO pobiera prawdziwe produkty
-            ProductsList = new ObservableCollection<Product>()
+            foreach (var inv in InvoicesList)
             {
-                new Product { Id = 1, Name = "Młotek", PriceNetto = 150.00m, Unit = "szt", Vat = 23 },
-                new Product { Id = 2, Name = "Coś innego", PriceNetto = 11.00m, Unit = "godz", Vat = 10 }
-            };
+                inv.Items ??= new ObservableCollection<InvoiceItem>();
+            }
 
-            Trace.WriteLine(ProductsList[0]);
+            if (ProductsList.Count > 0)
+                Trace.WriteLine(ProductsList[0]);
 
             Invoice_DataGrid.ItemsSource = CurrentInvoiceItems;
+            Reports_DataGrid.ItemsSource = InvoicesList;
             Clients_DataGrid.ItemsSource = ClientsList;
             Products_DataGrid.ItemsSource = ProductsList;
-            Reports_DataGrid.ItemsSource = InvoicesList;
 
             Input_InvoiceClientName.ItemsSource = ClientsList;
             Input_InvoiceClientName.DisplayMemberPath = "Name";
 
             Input_InvoiceItemName.ItemsSource = ProductsList;
             Input_InvoiceItemName.DisplayMemberPath = "Name";
+        }
+
+        private void Save<T>(string fileName, T data)
+        {
+            var json = JsonSerializer.Serialize(data, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            File.WriteAllText(fileName, json);
+        }
+
+        private ObservableCollection<T> Load<T>(string fileName)
+        {
+            if (!File.Exists(fileName))
+                return new ObservableCollection<T>();
+
+            var json = File.ReadAllText(fileName);
+
+            var data = JsonSerializer.Deserialize<ObservableCollection<T>>(json)
+                       ?? new ObservableCollection<T>();
+
+            return data;
         }
 
         private void AddClient_Click(object sender, RoutedEventArgs e)
@@ -74,6 +104,7 @@ namespace Faktury
             };
 
             ClientsList.Add(newClient);
+            Save(ClientsFile, ClientsList);
 
             CleanClientForm_Click(null, null);
 
@@ -143,6 +174,70 @@ namespace Faktury
             Input_InvoiceItemCount.Clear();
         }
 
+        private void SaveInvoice_Click(object sender, RoutedEventArgs e)
+        {
+            if (Input_InvoiceClientName.SelectedItem == null)
+            {
+                MessageBox.Show("Wybierz klienta!");
+                return;
+            }
+
+            if (CurrentInvoiceItems.Count == 0)
+            {
+                MessageBox.Show("Dodaj produkty!");
+                return;
+            }
+
+            // EDIT MODE
+            if (IsEditMode)
+            {
+                _selectedInvoice.Client = (Client)Input_InvoiceClientName.SelectedItem;
+                _selectedInvoice.Items = new ObservableCollection<InvoiceItem>(CurrentInvoiceItems.ToList());
+
+                Save(InvoicesFile, InvoicesList);
+
+                MessageBox.Show("Faktura zaktualizowana!");
+
+                return;
+            }
+
+            // NEW MODE
+            int nextId = InvoicesList.Count > 0
+                ? InvoicesList.Max(x => x.Id) + 1
+                : 1;
+
+            Invoice invoice = new Invoice
+            {
+                Id = nextId,
+                Client = (Client)Input_InvoiceClientName.SelectedItem,
+                Date = DateTime.Now,
+                Items = new ObservableCollection<InvoiceItem>(CurrentInvoiceItems.ToList())
+            };
+
+            InvoicesList.Add(invoice);
+            Save(InvoicesFile, InvoicesList);
+
+            MessageBox.Show("Faktura zapisana!");
+        }
+
+        private void NewInvoice_Click(object sender, RoutedEventArgs e)
+        {
+            _selectedInvoice = null;
+
+            CurrentInvoiceItems.Clear();
+            Input_InvoiceClientName.SelectedIndex = -1;
+        }
+
+        private void LoadInvoiceToForm(Invoice invoice)
+        {
+            CurrentInvoiceItems.Clear();
+
+            foreach (var item in invoice.Items)
+                CurrentInvoiceItems.Add(item);
+
+            Input_InvoiceClientName.SelectedItem = invoice.Client;
+        }
+
         private void AddProduct_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(Input_ProductName.Text))
@@ -172,6 +267,7 @@ namespace Faktury
             };
 
             ProductsList.Add(newProduct);
+            Save(ProductsFile, ProductsList);
 
             CleanProductForm_Click(null, null);
         }
@@ -182,59 +278,6 @@ namespace Faktury
             Input_ProductUnit.Clear();
             Input_ProductPrice.Clear();
             Input_ProductVat.Clear();
-        }
-
-        private void SaveInvoice_Click(object sender, RoutedEventArgs e)
-        {
-            if (Input_InvoiceClientName.SelectedItem == null)
-            {
-                MessageBox.Show("Wybierz klienta!");
-                return;
-            }
-
-            if (CurrentInvoiceItems.Count == 0)
-            {
-                MessageBox.Show("Dodaj produkty!");
-                return;
-            }
-
-            // EDIT MODE
-            if (IsEditMode)
-            {
-                _selectedInvoice.Client = (Client)Input_InvoiceClientName.SelectedItem;
-                _selectedInvoice.Items = new ObservableCollection<InvoiceItem>(CurrentInvoiceItems.ToList());
-
-                Reports_DataGrid.Items.Refresh();
-
-                MessageBox.Show("Faktura zaktualizowana!");
-
-                return;
-            }
-
-            // NEW MODE
-            int nextId = InvoicesList.Count > 0
-                ? InvoicesList.Max(x => x.Id) + 1
-                : 1;
-
-            Invoice invoice = new Invoice
-            {
-                Id = nextId,
-                Client = (Client)Input_InvoiceClientName.SelectedItem,
-                Date = DateTime.Now,
-                Items = new ObservableCollection<InvoiceItem>(CurrentInvoiceItems.ToList())
-            };
-
-            InvoicesList.Add(invoice);
-
-            MessageBox.Show("Faktura zapisana!");
-        }
-
-        private void NewInvoice_Click(object sender, RoutedEventArgs e)
-        {
-            _selectedInvoice = null;
-
-            CurrentInvoiceItems.Clear();
-            Input_InvoiceClientName.SelectedIndex = -1;
         }
 
         private void Reports_DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -250,15 +293,6 @@ namespace Faktury
             LoadInvoiceToForm(invoice);
         }
 
-        private void LoadInvoiceToForm(Invoice invoice)
-        {
-            CurrentInvoiceItems.Clear();
-
-            foreach (var item in invoice.Items)
-                CurrentInvoiceItems.Add(item);
-
-            Input_InvoiceClientName.SelectedItem = invoice.Client;
-        }
     }
 
     public class InvoiceItem
@@ -299,8 +333,8 @@ namespace Faktury
         public int Id { get; set; }
         public Client Client { get; set; }
         public DateTime Date { get; set; }
-        public ObservableCollection<InvoiceItem> Items { get; set; }
-        public decimal TotalNetto => Items?.Sum(x => x.ValueNetto) ?? 0;
-        public decimal TotalBrutto => Items?.Sum(x => x.ValueBrutto) ?? 0;
+        public ObservableCollection<InvoiceItem> Items { get; set; } = new();
+        public decimal TotalNetto => Items.Sum(x => x.ValueNetto);
+        public decimal TotalBrutto => Items.Sum(x => x.ValueBrutto);
     }
 }
