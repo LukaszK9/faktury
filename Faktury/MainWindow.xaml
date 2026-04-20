@@ -243,7 +243,13 @@
                     </Border>
 
                     <!-- Tabela -->
-                    <DataGrid Grid.Row="1" x:Name="Products_DataGrid" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F9F9F9" GridLinesVisibility="All">
+                    <DataGrid Grid.Row="1"
+                  x:Name="Products_DataGrid"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  AlternatingRowBackground="#F9F9F9"
+                  GridLinesVisibility="All">
+
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                             <DataGridTextColumn Header="Nazwa" Binding="{Binding Name}" Width="*"/>
@@ -271,7 +277,12 @@
             <TabItem Header="Raporty" x:Name="Tab_Raporty">
                 <Grid Margin="15">
 
-                    <DataGrid x:Name="Reports_DataGrid" AutoGenerateColumns="False" CanUserAddRows="False" MouseDoubleClick="Reports_DataGrid_MouseDoubleClick">
+                    <DataGrid x:Name="Reports_DataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              MouseDoubleClick="Reports_DataGrid_MouseDoubleClick">
+
+
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                             <DataGridTextColumn Header="Klient" Binding="{Binding Client.Name}" Width="*"/>
