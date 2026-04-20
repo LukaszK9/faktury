@@ -53,7 +53,7 @@
                         </Grid>
                     </Border>
 
-                    <DataGrid Grid.Row="1" x:Name="Invoice_DataGrid" AutoGenerateColumns="False" CanUserAddRows="False" AlternatingRowBackground="#F9F9F9" GridLinesVisibility="All">
+                    <DataGrid Grid.Row="1" x:Name="Invoice_DataGrid" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="False" AlternatingRowBackground="#F9F9F9" GridLinesVisibility="All">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                             <DataGridTextColumn Header="Nazwa" Binding="{Binding Name}" Width="*"/>
@@ -65,6 +65,25 @@
                             
                             <DataGridTextColumn Header="WARTOŚĆ NETTO" Binding="{Binding ValueNetto}" Width="120"/>
                             <DataGridTextColumn Header="WARTOŚĆ BRUTTO" Binding="{Binding ValueBrutto}" Width="120"/>
+
+                            <DataGridTemplateColumn Header="Akcje" Width="120">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+
+                                            <Button Content="✏"
+                                                    Width="40"
+                                                    Click="EditInvoiceItem_Click"/>
+
+                                            <Button Content="🗑"
+                                                    Width="40"
+                                                    Margin="5,0,0,0"
+                                                    Click="DeleteInvoiceItem_Click"/>
+                                            
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
