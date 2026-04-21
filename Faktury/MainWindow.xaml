@@ -170,6 +170,13 @@
                             <DataGridTextColumn Header="NIP" Binding="{Binding Nip}" Width="120"/>
                             <DataGridTextColumn Header="Adres" Binding="{Binding Adress}" Width="*"/>
                             <DataGridTextColumn Header="Kontakt" Binding="{Binding Contact}" Width="150"/>
+                            <DataGridTemplateColumn Header="Akcje" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="🗑" Width="40" Click="DeleteClient_Click"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
@@ -249,10 +256,15 @@
                             <DataGridTextColumn Header="Jednostka" Binding="{Binding Unit}" Width="100"/>
                             <DataGridTextColumn Header="Cena Netto" Binding="{Binding PriceNetto}" Width="120"/>
                             <DataGridTextColumn Header="VAT %" Binding="{Binding Vat}" Width="80"/>
+                            <DataGridTemplateColumn Header="Akcje" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="🗑" Width="40" Click="DeleteProduct_Click"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
-
                     </DataGrid>
-
                 </Grid>
             </TabItem>
 
@@ -277,8 +289,14 @@
                             <DataGridTextColumn Header="Data" Binding="{Binding Date}" Width="150"/>
                             <DataGridTextColumn Header="Netto" Binding="{Binding TotalNetto}" Width="120"/>
                             <DataGridTextColumn Header="Brutto" Binding="{Binding TotalBrutto}" Width="120"/>
+                            <DataGridTemplateColumn Header="Akcje" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="🗑" Width="40" Click="DeleteInvoice_Click"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
-
                     </DataGrid>
 
                 </Grid>
