@@ -101,8 +101,9 @@
                         <TextBlock Text="Data Wystawienia:" VerticalAlignment="Center" FontWeight="Bold" />
                         <DatePicker x:Name="Input_InvoiceDate" Width="120" Margin="10,0,20,0"/>
 
-                        <Button Content="Zapisz Fakturę" Width="120" Padding="5" Background="#4CAF50" Foreground="White" FontWeight="Bold" Margin="10,0,0,0" Click="SaveInvoice_Click"/>
                         <Button Content="Nowa faktura" Width="120" Margin="10,0,0,0" Click="NewInvoice_Click"/>
+                        <Button Content="Drukuj" Padding="5" Background="#3870ff" Foreground="White" FontWeight="Bold" Width="120" Margin="10,0,0,0" Click="PrintInvoice_Click"/>
+                        <Button Content="Zapisz Fakturę" Width="120" Padding="5" Background="#4CAF50" Foreground="White" FontWeight="Bold" Margin="10,0,0,0" Click="SaveInvoice_Click"/>
 
                     </StackPanel>
 

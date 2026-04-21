@@ -8,6 +8,8 @@ using System.Printing.IndexedProperties;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace Faktury
 {
@@ -544,6 +546,130 @@ namespace Faktury
             Tab_Faktury.IsSelected = true;
 
             LoadInvoiceToForm(invoice);
+        }
+
+        private void PrintInvoice_Click(object sender, RoutedEventArgs e)
+        {
+
+            Invoice invoiceToPrint = _selectedInvoice ?? Reports_DataGrid.SelectedItem as Invoice;
+
+            if (invoiceToPrint == null)
+            {
+                MessageBox.Show("Wybierz fakturę do wydruku!", "Brak faktury", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            PrintDialog printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() == true)
+            {
+                FlowDocument doc = CreateInvoiceDocument(invoiceToPrint);
+
+                // Adjust page size and margins to match the printer's capabilities
+                doc.PagePadding = new Thickness(50);
+                doc.ColumnWidth = printDialog.PrintableAreaWidth;
+
+                printDialog.PrintDocument(((IDocumentPaginatorSource)doc).DocumentPaginator, $"Faktura_{invoiceToPrint.Id}");
+            }
+        }
+
+        private FlowDocument CreateInvoiceDocument(Invoice invoice)
+        {
+            FlowDocument doc = new FlowDocument();
+            doc.FontFamily = new FontFamily("Segoe UI");
+
+            Paragraph header = new Paragraph(new Run($"FAKTURA VAT NR {invoice.Id}"))
+            {
+                FontSize = 24,
+                FontWeight = FontWeights.Bold,
+                TextAlignment = TextAlignment.Center,
+                Margin = new Thickness(0, 0, 0, 20)
+            };
+            doc.Blocks.Add(header);
+
+            Paragraph dateStr = new Paragraph(new Run($"Data wystawienia: {invoice.Date:yyyy-MM-dd}"))
+            {
+                TextAlignment = TextAlignment.Right,
+                Margin = new Thickness(0, 0, 0, 20)
+            };
+            doc.Blocks.Add(dateStr);
+
+            Paragraph clientInfo = new Paragraph();
+            clientInfo.Inlines.Add(new Run("NABYWCA:\n") { FontWeight = FontWeights.Bold });
+
+            // Using ?. operator just in case the client object is missing
+            string clientName = invoice.Client?.Name ?? "Brak danych";
+            string clientAdres = invoice.Client?.Adress ?? "-";
+            string clientNip = invoice.Client?.Nip ?? "-";
+
+            clientInfo.Inlines.Add(new Run($"{clientName}\nAdres: {clientAdres}\nNIP: {clientNip}"));
+            clientInfo.Margin = new Thickness(0, 0, 0, 30);
+            doc.Blocks.Add(clientInfo);
+
+            Table table = new Table();
+            table.CellSpacing = 0;
+            table.BorderBrush = Brushes.Black;
+            table.BorderThickness = new Thickness(1);
+
+            table.Columns.Add(new TableColumn() { Width = new GridLength(30) });  // Lp
+            table.Columns.Add(new TableColumn() { Width = new GridLength(150) }); // Name
+            table.Columns.Add(new TableColumn() { Width = new GridLength(50) });  // Count
+            table.Columns.Add(new TableColumn() { Width = new GridLength(40) });  // Unit
+            table.Columns.Add(new TableColumn() { Width = new GridLength(70) });  // Price Net
+            table.Columns.Add(new TableColumn() { Width = new GridLength(40) });  // VAT
+            table.Columns.Add(new TableColumn() { Width = new GridLength(80) });  // Val Net
+            table.Columns.Add(new TableColumn() { Width = new GridLength(80) });  // Val Gross
+
+            TableRowGroup headerGroup = new TableRowGroup();
+            TableRow headerRow = new TableRow() { Background = Brushes.LightGray, FontWeight = FontWeights.Bold };
+
+            string[] headers = { "Lp", "Nazwa", "Ilość", "Jm", "Cena Net", "VAT%", "Wart. Net", "Wart. Bru" };
+            foreach (string h in headers)
+            {
+                headerRow.Cells.Add(new TableCell(new Paragraph(new Run(h))) { Padding = new Thickness(5), BorderBrush = Brushes.Black, BorderThickness = new Thickness(0, 0, 0, 1) });
+            }
+            headerGroup.Rows.Add(headerRow);
+            table.RowGroups.Add(headerGroup);
+
+            TableRowGroup itemsGroup = new TableRowGroup();
+            int lp = 1;
+            if (invoice.Items != null)
+            {
+                foreach (var item in invoice.Items)
+                {
+                    TableRow row = new TableRow();
+                    row.Cells.Add(CreateCell(lp.ToString()));
+                    row.Cells.Add(CreateCell(item.Name));
+                    row.Cells.Add(CreateCell(item.Count.ToString()));
+                    row.Cells.Add(CreateCell(item.Unit));
+                    row.Cells.Add(CreateCell($"{item.PriceNetto:0.00} zł"));
+                    row.Cells.Add(CreateCell(item.Vat.ToString()));
+                    row.Cells.Add(CreateCell($"{item.ValueNetto:0.00} zł"));
+                    row.Cells.Add(CreateCell($"{item.ValueBrutto:0.00} zł"));
+                    itemsGroup.Rows.Add(row);
+                    lp++;
+                }
+            }
+            table.RowGroups.Add(itemsGroup);
+            doc.Blocks.Add(table);
+
+            Paragraph summary = new Paragraph();
+            summary.Inlines.Add(new Run($"\nRazem Netto: {invoice.TotalNetto:0.00} zł\n") { FontSize = 14 });
+            summary.Inlines.Add(new Run($"Razem Brutto: {invoice.TotalBrutto:0.00} zł") { FontSize = 16, FontWeight = FontWeights.Bold });
+            summary.TextAlignment = TextAlignment.Right;
+            summary.Margin = new Thickness(0, 20, 0, 0);
+            doc.Blocks.Add(summary);
+
+            return doc;
+        }
+
+        private TableCell CreateCell(string text)
+        {
+            return new TableCell(new Paragraph(new Run(text)))
+            {
+                Padding = new Thickness(5),
+                BorderBrush = Brushes.LightGray,
+                BorderThickness = new Thickness(0, 0, 0, 1)
+            };
         }
 
     }
