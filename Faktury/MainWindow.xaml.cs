@@ -395,9 +395,15 @@ namespace Faktury
             Invoice_DataGrid.ItemsSource = null;
             Invoice_DataGrid.ItemsSource = _selectedInvoice.Items;
 
-            Trace.WriteLine(invoice.Client);
+            if (invoice.Client != null)
+            {
+                Input_InvoiceClientName.SelectedItem = ClientsList.FirstOrDefault(c => c.Id == invoice.Client.Id);
+            }
+            else
+            {
+                Input_InvoiceClientName.SelectedItem = null;
+            }
 
-            Input_InvoiceClientName.SelectedItem = invoice.Client;
             Input_InvoiceDate.SelectedDate = invoice.Date;
 
             Invoice_ModeElement.Visibility = Visibility.Visible;
