@@ -268,7 +268,7 @@ namespace Faktury
             }
 
             _selectedInvoice.Client = (Client)Input_InvoiceClientName.SelectedItem;
-            _selectedInvoice.Date = DateTime.Now;
+            _selectedInvoice.Date = Input_InvoiceDate.SelectedDate ?? DateTime.Now;
 
             if (!InvoicesList.Contains(_selectedInvoice))
             {
@@ -349,6 +349,7 @@ namespace Faktury
             Invoice_DataGrid.ItemsSource = _selectedInvoice.Items;
 
             Input_InvoiceClientName.SelectedIndex = -1;
+            Invoice_ModeElement.Visibility = Visibility.Collapsed;
         }
 
         private void LoadInvoiceToForm(Invoice invoice)
@@ -359,6 +360,10 @@ namespace Faktury
             Invoice_DataGrid.ItemsSource = _selectedInvoice.Items;
 
             Input_InvoiceClientName.SelectedItem = invoice.Client;
+            Input_InvoiceDate.SelectedDate = invoice.Date;
+
+            Invoice_ModeElement.Visibility = Visibility.Visible;
+            Invoice_ModeText.Text = $"Edytujesz Fakturę nr. {invoice.Id}";
         }
 
         private void AddProduct_Click(object sender, RoutedEventArgs e)
