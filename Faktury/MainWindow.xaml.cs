@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Printing.IndexedProperties;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Faktury
 {
@@ -287,17 +289,33 @@ namespace Faktury
 
         private void EditInvoiceItem_Click(object sender, RoutedEventArgs e)
         {
+            // Edits the global product template. (In-grid edits apply only to the current invoice; this button updates the base product for future use).
+
             if (Invoice_DataGrid.SelectedItem is not InvoiceItem item)
                 return;
 
-            _editingItem = item;
+            Tab_Produkty.IsSelected = true;
 
-            Input_InvoiceItemName.SelectedItem =
-                ProductsList.FirstOrDefault(p => p.Name == item.Name);
+            var productsList = Products_DataGrid.ItemsSource as IEnumerable<Product>;
 
-            Input_InvoiceItemCount.Text = item.Count.ToString();
+            if (productsList != null)
+            {
+                // Find all products with the matching name
+                // Order them by ID (lowest to highest)
+                // Take the first one (which will be the lowest ID)
+                var targetProduct = productsList
+                    .Where(p => p.Name == item.Name)
+                    .OrderBy(p => p.Id)
+                    .FirstOrDefault();
 
-            MessageBox.Show("Edytuj dane i kliknij 'Dodaj pozycję' (zastąpi starą)");
+                if (targetProduct != null)
+                {
+                    Products_DataGrid.SelectedItem = targetProduct;
+
+                    Products_DataGrid.ScrollIntoView(targetProduct);
+                }
+            }
+
         }
 
         private void DeleteInvoiceItem_Click(object sender, RoutedEventArgs e)
@@ -374,6 +392,31 @@ namespace Faktury
                 return;
             }
 
+            if (!decimal.TryParse(Input_ProductPrice.Text, out decimal _priceNetto))
+            {
+                MessageBox.Show("Cena musi być numerem!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!decimal.TryParse(Input_ProductVat.Text, out decimal _vat))
+            {
+                MessageBox.Show("Vat musi być numerem!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (_priceNetto < 0)
+            {
+                MessageBox.Show("Cena netto nie może być ujemna!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (_vat < 0)
+            {
+                MessageBox.Show("Vat nie może być ujemny!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+
             int nextId = 1;
             if (ProductsList.Count > 0)
             {
@@ -390,14 +433,44 @@ namespace Faktury
                 Id = nextId,
                 Name = Input_ProductName.Text,
                 Unit = Input_ProductUnit.Text,
-                PriceNetto = decimal.Parse(Input_ProductPrice.Text),
-                Vat = decimal.Parse(Input_ProductVat.Text)
+                PriceNetto = _priceNetto,
+                Vat = _vat
             };
 
             ProductsList.Add(newProduct);
             Save(ProductsFile, ProductsList);
 
             CleanProductForm_Click(null, null);
+        }
+
+        private void EditProduct_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = sender as Button;
+
+            if (clickedButton?.DataContext is not Product editedProduct)
+                return;
+
+            if (string.IsNullOrWhiteSpace(editedProduct.Name))
+            {
+                MessageBox.Show("Nazwa produktu jest wymagana!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (editedProduct.PriceNetto < 0)
+            {
+                MessageBox.Show("Cena netto nie może być ujemna!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (editedProduct.Vat < 0)
+            {
+                MessageBox.Show("Vat nie może być ujemny!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            Save(ProductsFile, ProductsList);
+
+            MessageBox.Show($"Zapisano zmiany dla: {editedProduct.Name}", "Zapisano", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void DeleteProduct_Click(object sender, RoutedEventArgs e)

@@ -249,23 +249,38 @@
                   x:Name="Products_DataGrid"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
+                  CanUserDeleteRows="False"
                   AlternatingRowBackground="#F9F9F9"
                   GridLinesVisibility="All">
 
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                            <DataGridTextColumn Header="Nazwa" Binding="{Binding Name}" Width="*"/>
-                            <DataGridTextColumn Header="Jednostka" Binding="{Binding Unit}" Width="100"/>
-                            <DataGridTextColumn Header="Cena Netto" Binding="{Binding PriceNetto}" Width="120"/>
-                            <DataGridTextColumn Header="VAT %" Binding="{Binding Vat}" Width="80"/>
-                            <DataGridTemplateColumn Header="Akcje" Width="80">
+                            
+                            <DataGridTextColumn x:Name="Products_Input_ProductId" Header="ID" Binding="{Binding Id}" Width="50"/>
+                            <DataGridTextColumn x:Name="Products_Input_ProductName" Header="Nazwa" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn x:Name="Products_Input_ProductUnit" Header="Jednostka" Binding="{Binding Unit}" Width="100"/>
+                            <DataGridTextColumn x:Name="Products_Input_ProductPriceNetto" Header="Cena Netto" Binding="{Binding PriceNetto}" Width="120"/>
+                            <DataGridTextColumn x:Name="Products_Input_ProductVat" Header="VAT %" Binding="{Binding Vat}" Width="80"/>
+                            <DataGridTemplateColumn Header="Akcje" Width="120">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="🗑" Width="40" Click="DeleteProduct_Click"/>
+                                        <StackPanel Orientation="Horizontal">
+
+                                            <Button Content="✓"
+                                                    Width="40"
+                                                    Click="EditProduct_Click"/>
+
+                                            <Button Content="🗑"
+                                                    Width="40"
+                                                    Margin="5,0,0,0"
+                                                    Click="DeleteProduct_Click"/>
+
+                                        </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
+                            
                         </DataGrid.Columns>
+                        
                     </DataGrid>
                 </Grid>
             </TabItem>
