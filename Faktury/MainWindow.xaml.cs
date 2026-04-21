@@ -134,6 +134,24 @@ namespace Faktury
 
         }
 
+        private void EditClient_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = sender as Button;
+
+            if (clickedButton?.DataContext is not Client editedClient)
+                return;
+
+            if (string.IsNullOrWhiteSpace(editedClient.Name))
+            {
+                MessageBox.Show("Nazwa klienta jest wymagana!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            Save(ClientsFile, ClientsList);
+
+            MessageBox.Show($"Zapisano zmiany dla: {editedClient.Name}", "Zapisano", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         private void DeleteClient_Click(object sender, RoutedEventArgs e)
         {
             if (Clients_DataGrid.SelectedItem is not Client client)
@@ -376,6 +394,8 @@ namespace Faktury
 
             Invoice_DataGrid.ItemsSource = null;
             Invoice_DataGrid.ItemsSource = _selectedInvoice.Items;
+
+            Trace.WriteLine(invoice.Client);
 
             Input_InvoiceClientName.SelectedItem = invoice.Client;
             Input_InvoiceDate.SelectedDate = invoice.Date;
