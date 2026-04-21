@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -6,6 +7,9 @@ using System.Linq;
 using System.Printing.IndexedProperties;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace Faktury
 {
@@ -130,6 +134,24 @@ namespace Faktury
 
             CleanClientForm_Click(null, null);
 
+        }
+
+        private void EditClient_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = sender as Button;
+
+            if (clickedButton?.DataContext is not Client editedClient)
+                return;
+
+            if (string.IsNullOrWhiteSpace(editedClient.Name))
+            {
+                MessageBox.Show("Nazwa klienta jest wymagana!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            Save(ClientsFile, ClientsList);
+
+            MessageBox.Show($"Zapisano zmiany dla: {editedClient.Name}", "Zapisano", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void DeleteClient_Click(object sender, RoutedEventArgs e)
@@ -268,7 +290,7 @@ namespace Faktury
             }
 
             _selectedInvoice.Client = (Client)Input_InvoiceClientName.SelectedItem;
-            _selectedInvoice.Date = DateTime.Now;
+            _selectedInvoice.Date = Input_InvoiceDate.SelectedDate ?? DateTime.Now;
 
             if (!InvoicesList.Contains(_selectedInvoice))
             {
@@ -287,17 +309,33 @@ namespace Faktury
 
         private void EditInvoiceItem_Click(object sender, RoutedEventArgs e)
         {
+            // Edits the global product template. (In-grid edits apply only to the current invoice; this button updates the base product for future use).
+
             if (Invoice_DataGrid.SelectedItem is not InvoiceItem item)
                 return;
 
-            _editingItem = item;
+            Tab_Produkty.IsSelected = true;
 
-            Input_InvoiceItemName.SelectedItem =
-                ProductsList.FirstOrDefault(p => p.Name == item.Name);
+            var productsList = Products_DataGrid.ItemsSource as IEnumerable<Product>;
 
-            Input_InvoiceItemCount.Text = item.Count.ToString();
+            if (productsList != null)
+            {
+                // Find all products with the matching name
+                // Order them by ID (lowest to highest)
+                // Take the first one (which will be the lowest ID)
+                var targetProduct = productsList
+                    .Where(p => p.Name == item.Name)
+                    .OrderBy(p => p.Id)
+                    .FirstOrDefault();
 
-            MessageBox.Show("Edytuj dane i kliknij 'Dodaj pozycję' (zastąpi starą)");
+                if (targetProduct != null)
+                {
+                    Products_DataGrid.SelectedItem = targetProduct;
+
+                    Products_DataGrid.ScrollIntoView(targetProduct);
+                }
+            }
+
         }
 
         private void DeleteInvoiceItem_Click(object sender, RoutedEventArgs e)
@@ -349,6 +387,7 @@ namespace Faktury
             Invoice_DataGrid.ItemsSource = _selectedInvoice.Items;
 
             Input_InvoiceClientName.SelectedIndex = -1;
+            Invoice_ModeElement.Visibility = Visibility.Collapsed;
         }
 
         private void LoadInvoiceToForm(Invoice invoice)
@@ -358,7 +397,19 @@ namespace Faktury
             Invoice_DataGrid.ItemsSource = null;
             Invoice_DataGrid.ItemsSource = _selectedInvoice.Items;
 
-            Input_InvoiceClientName.SelectedItem = invoice.Client;
+            if (invoice.Client != null)
+            {
+                Input_InvoiceClientName.SelectedItem = ClientsList.FirstOrDefault(c => c.Id == invoice.Client.Id);
+            }
+            else
+            {
+                Input_InvoiceClientName.SelectedItem = null;
+            }
+
+            Input_InvoiceDate.SelectedDate = invoice.Date;
+
+            Invoice_ModeElement.Visibility = Visibility.Visible;
+            Invoice_ModeText.Text = $"Edytujesz Fakturę nr. {invoice.Id}";
         }
 
         private void AddProduct_Click(object sender, RoutedEventArgs e)
@@ -368,6 +419,31 @@ namespace Faktury
                 MessageBox.Show("Nazwa produktu jest wymagana!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            if (!decimal.TryParse(Input_ProductPrice.Text, out decimal _priceNetto))
+            {
+                MessageBox.Show("Cena musi być numerem!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!decimal.TryParse(Input_ProductVat.Text, out decimal _vat))
+            {
+                MessageBox.Show("Vat musi być numerem!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (_priceNetto < 0)
+            {
+                MessageBox.Show("Cena netto nie może być ujemna!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (_vat < 0)
+            {
+                MessageBox.Show("Vat nie może być ujemny!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
 
             int nextId = 1;
             if (ProductsList.Count > 0)
@@ -385,14 +461,44 @@ namespace Faktury
                 Id = nextId,
                 Name = Input_ProductName.Text,
                 Unit = Input_ProductUnit.Text,
-                PriceNetto = decimal.Parse(Input_ProductPrice.Text),
-                Vat = decimal.Parse(Input_ProductVat.Text)
+                PriceNetto = _priceNetto,
+                Vat = _vat
             };
 
             ProductsList.Add(newProduct);
             Save(ProductsFile, ProductsList);
 
             CleanProductForm_Click(null, null);
+        }
+
+        private void EditProduct_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = sender as Button;
+
+            if (clickedButton?.DataContext is not Product editedProduct)
+                return;
+
+            if (string.IsNullOrWhiteSpace(editedProduct.Name))
+            {
+                MessageBox.Show("Nazwa produktu jest wymagana!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (editedProduct.PriceNetto < 0)
+            {
+                MessageBox.Show("Cena netto nie może być ujemna!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (editedProduct.Vat < 0)
+            {
+                MessageBox.Show("Vat nie może być ujemny!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            Save(ProductsFile, ProductsList);
+
+            MessageBox.Show($"Zapisano zmiany dla: {editedProduct.Name}", "Zapisano", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void DeleteProduct_Click(object sender, RoutedEventArgs e)
@@ -440,6 +546,130 @@ namespace Faktury
             Tab_Faktury.IsSelected = true;
 
             LoadInvoiceToForm(invoice);
+        }
+
+        private void PrintInvoice_Click(object sender, RoutedEventArgs e)
+        {
+
+            Invoice invoiceToPrint = _selectedInvoice ?? Reports_DataGrid.SelectedItem as Invoice;
+
+            if (invoiceToPrint == null)
+            {
+                MessageBox.Show("Wybierz fakturę do wydruku!", "Brak faktury", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            PrintDialog printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() == true)
+            {
+                FlowDocument doc = CreateInvoiceDocument(invoiceToPrint);
+
+                // Adjust page size and margins to match the printer's capabilities
+                doc.PagePadding = new Thickness(50);
+                doc.ColumnWidth = printDialog.PrintableAreaWidth;
+
+                printDialog.PrintDocument(((IDocumentPaginatorSource)doc).DocumentPaginator, $"Faktura_{invoiceToPrint.Id}");
+            }
+        }
+
+        private FlowDocument CreateInvoiceDocument(Invoice invoice)
+        {
+            FlowDocument doc = new FlowDocument();
+            doc.FontFamily = new FontFamily("Segoe UI");
+
+            Paragraph header = new Paragraph(new Run($"FAKTURA VAT NR {invoice.Id}"))
+            {
+                FontSize = 24,
+                FontWeight = FontWeights.Bold,
+                TextAlignment = TextAlignment.Center,
+                Margin = new Thickness(0, 0, 0, 20)
+            };
+            doc.Blocks.Add(header);
+
+            Paragraph dateStr = new Paragraph(new Run($"Data wystawienia: {invoice.Date:yyyy-MM-dd}"))
+            {
+                TextAlignment = TextAlignment.Right,
+                Margin = new Thickness(0, 0, 0, 20)
+            };
+            doc.Blocks.Add(dateStr);
+
+            Paragraph clientInfo = new Paragraph();
+            clientInfo.Inlines.Add(new Run("NABYWCA:\n") { FontWeight = FontWeights.Bold });
+
+            // Using ?. operator just in case the client object is missing
+            string clientName = invoice.Client?.Name ?? "Brak danych";
+            string clientAdres = invoice.Client?.Adress ?? "-";
+            string clientNip = invoice.Client?.Nip ?? "-";
+
+            clientInfo.Inlines.Add(new Run($"{clientName}\nAdres: {clientAdres}\nNIP: {clientNip}"));
+            clientInfo.Margin = new Thickness(0, 0, 0, 30);
+            doc.Blocks.Add(clientInfo);
+
+            Table table = new Table();
+            table.CellSpacing = 0;
+            table.BorderBrush = Brushes.Black;
+            table.BorderThickness = new Thickness(1);
+
+            table.Columns.Add(new TableColumn() { Width = new GridLength(30) });  // Lp
+            table.Columns.Add(new TableColumn() { Width = new GridLength(150) }); // Name
+            table.Columns.Add(new TableColumn() { Width = new GridLength(50) });  // Count
+            table.Columns.Add(new TableColumn() { Width = new GridLength(40) });  // Unit
+            table.Columns.Add(new TableColumn() { Width = new GridLength(70) });  // Price Net
+            table.Columns.Add(new TableColumn() { Width = new GridLength(40) });  // VAT
+            table.Columns.Add(new TableColumn() { Width = new GridLength(80) });  // Val Net
+            table.Columns.Add(new TableColumn() { Width = new GridLength(80) });  // Val Gross
+
+            TableRowGroup headerGroup = new TableRowGroup();
+            TableRow headerRow = new TableRow() { Background = Brushes.LightGray, FontWeight = FontWeights.Bold };
+
+            string[] headers = { "Lp", "Nazwa", "Ilość", "Jm", "Cena Net", "VAT%", "Wart. Net", "Wart. Bru" };
+            foreach (string h in headers)
+            {
+                headerRow.Cells.Add(new TableCell(new Paragraph(new Run(h))) { Padding = new Thickness(5), BorderBrush = Brushes.Black, BorderThickness = new Thickness(0, 0, 0, 1) });
+            }
+            headerGroup.Rows.Add(headerRow);
+            table.RowGroups.Add(headerGroup);
+
+            TableRowGroup itemsGroup = new TableRowGroup();
+            int lp = 1;
+            if (invoice.Items != null)
+            {
+                foreach (var item in invoice.Items)
+                {
+                    TableRow row = new TableRow();
+                    row.Cells.Add(CreateCell(lp.ToString()));
+                    row.Cells.Add(CreateCell(item.Name));
+                    row.Cells.Add(CreateCell(item.Count.ToString()));
+                    row.Cells.Add(CreateCell(item.Unit));
+                    row.Cells.Add(CreateCell($"{item.PriceNetto:0.00} zł"));
+                    row.Cells.Add(CreateCell(item.Vat.ToString()));
+                    row.Cells.Add(CreateCell($"{item.ValueNetto:0.00} zł"));
+                    row.Cells.Add(CreateCell($"{item.ValueBrutto:0.00} zł"));
+                    itemsGroup.Rows.Add(row);
+                    lp++;
+                }
+            }
+            table.RowGroups.Add(itemsGroup);
+            doc.Blocks.Add(table);
+
+            Paragraph summary = new Paragraph();
+            summary.Inlines.Add(new Run($"\nRazem Netto: {invoice.TotalNetto:0.00} zł\n") { FontSize = 14 });
+            summary.Inlines.Add(new Run($"Razem Brutto: {invoice.TotalBrutto:0.00} zł") { FontSize = 16, FontWeight = FontWeights.Bold });
+            summary.TextAlignment = TextAlignment.Right;
+            summary.Margin = new Thickness(0, 20, 0, 0);
+            doc.Blocks.Add(summary);
+
+            return doc;
+        }
+
+        private TableCell CreateCell(string text)
+        {
+            return new TableCell(new Paragraph(new Run(text)))
+            {
+                Padding = new Thickness(5),
+                BorderBrush = Brushes.LightGray,
+                BorderThickness = new Thickness(0, 0, 0, 1)
+            };
         }
 
     }
